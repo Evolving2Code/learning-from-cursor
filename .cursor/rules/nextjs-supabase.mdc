@@ -1,0 +1,46 @@
+---
+description: Conventions for Next.js App Router + Supabase projects
+globs:
+  - "**/*.{ts,tsx,js,jsx}"
+alwaysApply: false
+---
+
+# Next.js + Supabase conventions
+
+## Stack defaults
+
+- Next.js App Router (not Pages Router unless the file already uses it)
+- TypeScript strict; avoid `any`
+- Supabase via `@supabase/ssr` for auth and server/client clients
+
+## Server vs client
+
+- Default to Server Components — no `'use client'` unless the component needs hooks, browser APIs, or event handlers
+- Never import server-only modules (e.g. `next/headers`, server Supabase client) into client components
+- Fetch data in RSC or server actions; don't duplicate fetches in `useEffect` when RSC can do it
+
+## Supabase
+
+- Browser: anon key only (`NEXT_PUBLIC_SUPABASE_ANON_KEY`)
+- Server: use cookie-aware `createServerClient`; service role key only in server-only code, never `NEXT_PUBLIC_`
+- Respect RLS — do not use service role to bypass policies from user-facing code
+- Prefer generated `Database` types from `supabase gen types`
+
+## Project layout
+
+- `app/` — routes, layouts, server actions colocated with features when small
+- `components/` — shared UI; `components/ui/` for primitives
+- `lib/supabase/` — client factories (`server.ts`, `client.ts`, `middleware.ts`)
+- `lib/` — shared utilities and data-access helpers
+
+## Changes
+
+- Smallest correct diff; don't refactor unrelated code
+- No new dependencies without explicit ask
+- Update `.env.example` when adding env vars; never commit real secrets
+- Match existing naming, formatting, and patterns in the file you're editing
+
+## When unsure
+
+- Ask which Supabase client (server vs browser) before writing queries
+- Prefer explicit error handling over empty catch blocks
